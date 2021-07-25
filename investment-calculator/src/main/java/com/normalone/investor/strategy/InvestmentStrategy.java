@@ -4,18 +4,17 @@ import com.normalone.investor.domain.*;
 import com.normalone.investor.yahoo.CandleStickDownloader;
 import yahoofinance.histquotes.Interval;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
 
 public class InvestmentStrategy {
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         CandleStickDownloader candleStickDownloader = CandleStickDownloader.builder().build();
         Collection<Asset> assets = assetsToTest();
         assets.stream()
-              .forEach(asset -> asset.setTimeSeriesBars(candleStickDownloader.downloadCandleSticks(asset.getTicker(), Interval.MONTHLY, 120)));
+                .forEach(asset -> asset.setTimeSeriesBars(candleStickDownloader.downloadCandleSticks(asset.getTicker(), Interval.MONTHLY, 120)));
 
-        InvestmentParam investmentParam = InvestmentParam.builder().lengthofInvestment(120).capitalPerPeriod(500).build();
+        InvestmentParam investmentParam = InvestmentParam.builder().lengthofInvestment(24).capitalPerPeriod(200).build();
         CostAverageInvestment costAverageInvestment = CostAverageInvestment.builder().investmentParam(investmentParam).assets(assets).build();
         InvestmentReport investmentReport = costAverageInvestment.runInvestment();
 
@@ -33,7 +32,21 @@ public class InvestmentStrategy {
     }
 
     private static Collection<Asset> assetsToTest() {
-        return
+
+        Set<Asset> allAssets = new HashSet<>();
+        Set<Asset> stocks = new HashSet<>();
+
+        // S&P Top 25 Stocks.
+        for (String ticker : Arrays.asList("CSCO", "INTC", "VZ", "ADBE", "CMCSA", "XOM", "PYPL", "AAPL", "BAC", "MA", "DIS", "HD", "PG", "UNH", "V", "NVDA", "JNJ", "TSLA", "JPM", "BRK-B", "GOOG", "FB", "AMZN", "MSFT")) {
+            stocks.add(Asset.builder().ticker(ticker).assetType(AssetType.STOCK).build());
+        }
+
+        // Top Value and Growth Stocks
+        /*for(String ticker : Arrays.asList("LB","HES","IT","EXR","FCX","BIIB","KSU")) {
+            stocks.add(Asset.builder().ticker(ticker).assetType(AssetType.STOCK).build());
+        }*/
+
+        List<Asset> otherAssets =
                 Arrays.asList(
                         Asset.builder().ticker("SPY").assetType(AssetType.ETF).build(),
                         Asset.builder().ticker("AGG").assetType(AssetType.ETF).build(),
@@ -43,9 +56,10 @@ public class InvestmentStrategy {
                         Asset.builder().ticker("VTI").assetType(AssetType.ETF).build(),
                         Asset.builder().ticker("GLD").assetType(AssetType.METAL).build(),
                         Asset.builder().ticker("IWM").assetType(AssetType.ETF).build(),
-                        Asset.builder().ticker("VIG").assetType(AssetType.ETF).build(),
-                        Asset.builder().ticker("AAPL").assetType(AssetType.STOCK).build()
-
+                        Asset.builder().ticker("VIG").assetType(AssetType.ETF).build()
                 );
+        allAssets.addAll(stocks);
+        allAssets.addAll(otherAssets);
+        return allAssets;
     }
 }
