@@ -14,7 +14,7 @@ public class InvestmentStrategy {
         assets.stream()
                 .forEach(asset -> asset.setTimeSeriesBars(candleStickDownloader.downloadCandleSticks(asset.getTicker(), Interval.MONTHLY, 120)));
 
-        InvestmentParam investmentParam = InvestmentParam.builder().lengthofInvestment(24).capitalPerPeriod(200).build();
+        InvestmentParam investmentParam = InvestmentParam.builder().lengthofInvestment(60).capitalPerPeriod(200).build();
         CostAverageInvestment costAverageInvestment = CostAverageInvestment.builder().investmentParam(investmentParam).assets(assets).build();
         InvestmentReport investmentReport = costAverageInvestment.runInvestment();
 
@@ -37,7 +37,14 @@ public class InvestmentStrategy {
         Set<Asset> stocks = new HashSet<>();
 
         // S&P Top 25 Stocks.
-        for (String ticker : Arrays.asList("CSCO", "INTC", "VZ", "ADBE", "CMCSA", "XOM", "PYPL", "AAPL", "BAC", "MA", "DIS", "HD", "PG", "UNH", "V", "NVDA", "JNJ", "TSLA", "JPM", "BRK-B", "GOOG", "FB", "AMZN", "MSFT")) {
+       /* for (String ticker : Arrays.asList("CSCO", "INTC", "VZ", "ADBE", "CMCSA", "XOM", "PYPL", "AAPL", "BAC", "MA", "DIS", "HD", "PG", "UNH", "V", "NVDA", "JNJ", "TSLA", "JPM", "BRK-B", "GOOG", "FB", "AMZN", "MSFT")) {
+            stocks.add(Asset.builder().ticker(ticker).assetType(AssetType.STOCK).build());
+        }*/
+
+        //Top 10 Companies by Sector, Sales Growth/5yr > 25%[Finiz filter] and sorted by MCap
+        for (String ticker : Arrays.asList("NVDA","CRM","AMD","NOW","UBER","SQ","WDAY","PANW","ZS","NET", //TEchnology
+                                           "CI","REGN","VRTX","MRNA","CNC","DXCM","ALGN","VEEV","SGEN","ALNY" //Healthcare
+                )) {
             stocks.add(Asset.builder().ticker(ticker).assetType(AssetType.STOCK).build());
         }
 
@@ -49,14 +56,14 @@ public class InvestmentStrategy {
         List<Asset> otherAssets =
                 Arrays.asList(
                         Asset.builder().ticker("SPY").assetType(AssetType.ETF).build(),
-                        Asset.builder().ticker("AGG").assetType(AssetType.ETF).build(),
+                        Asset.builder().ticker("AGG").assetType(AssetType.ETF).build(), // agg bond
                         Asset.builder().ticker("XLK").assetType(AssetType.ETF).build(),
-                        Asset.builder().ticker("XLV").assetType(AssetType.ETF).build(),
-                        Asset.builder().ticker("VUG").assetType(AssetType.ETF).build(),
-                        Asset.builder().ticker("VTI").assetType(AssetType.ETF).build(),
+                        Asset.builder().ticker("XLV").assetType(AssetType.ETF).build(), // Healthcare
+                        Asset.builder().ticker("VUG").assetType(AssetType.ETF).build(), // Growth
+                        Asset.builder().ticker("VTI").assetType(AssetType.ETF).build(), // TOtal stocks
                         Asset.builder().ticker("GLD").assetType(AssetType.METAL).build(),
-                        Asset.builder().ticker("IWM").assetType(AssetType.ETF).build(),
-                        Asset.builder().ticker("VIG").assetType(AssetType.ETF).build()
+                        Asset.builder().ticker("IWM").assetType(AssetType.ETF).build(), // Rusell 2000
+                        Asset.builder().ticker("VIG").assetType(AssetType.ETF).build() // Div stocks
                 );
         allAssets.addAll(stocks);
         allAssets.addAll(otherAssets);

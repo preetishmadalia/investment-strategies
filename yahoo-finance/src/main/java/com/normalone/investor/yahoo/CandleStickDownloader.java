@@ -13,6 +13,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -34,6 +35,10 @@ public class CandleStickDownloader {
         );
     }
 
+    private boolean filterCandle(TimeSeriesBar timeSeriesBar) {
+        return !(timeSeriesBar.getClosePrice() == 0.0);
+    }
+
     /**
      *
      * @param ticker - Name of ticker.
@@ -45,9 +50,19 @@ public class CandleStickDownloader {
         from.add(getField(interval), - Math.max(0, length - 1));
         Calendar to = Calendar.getInstance();
 
+        return downloadCandleSticks(ticker, interval, from, to);
+    }
+
+    public List<TimeSeriesBar> downloadCandleSticks(final String ticker, final Interval interval, Calendar from, Calendar to) {
+
         try {
             Stock stock = YahooFinance.get(ticker, from, to, interval);
-            return stock.getHistory().stream().map(yahooCandleConversion()::apply).collect(Collectors.toList());
+            if(stock != null)
+                return stock.getHistory()
+                        .stream()
+                        .map(yahooCandleConversion()::apply)
+                        .filter(timeSeriesBar ->  filterCandle(timeSeriesBar))
+                        .collect(Collectors.toList());
         } catch (IOException e) {
             e.printStackTrace();
             log.error("Error downloading ticker, {}", ticker);
