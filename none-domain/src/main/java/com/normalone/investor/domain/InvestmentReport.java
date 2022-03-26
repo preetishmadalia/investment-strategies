@@ -51,4 +51,22 @@ public class InvestmentReport {
                 .sorted(Comparator.comparing(asset -> asset.mathFunction(asset.getCurrentInvestmentValue(), asset.getTotalAmountInvested(), percentageReturnsFunc())))
                 .skip(this.assets.size() - 2).map(asset -> asset.getTicker() + "["+ percentReturnsAsset(asset.getTicker()) + "]").collect(Collectors.toSet());
     }
+
+    public String portfolioDistribution() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Num. of assets : ").append(numOfAssets()).append(", ");
+        builder.append("Stocks : ").append(numOfAssets(AssetType.STOCK)).append(", ");
+        builder.append("ETF : ").append(numOfAssets(AssetType.ETF)).append(", ");
+        builder.append("Commodity : ").append(numOfAssets(AssetType.COMMODITY)).append(", ");
+        builder.append("Crypto : ").append(numOfAssets(AssetType.CRYPTO));
+        return builder.toString();
+    }
+
+    public long numOfAssets() {
+        return this.assets.size();
+    }
+
+    public long numOfAssets(AssetType type) {
+        return this.assets.stream().filter(asset -> asset.getAssetType().equals(type)).count();
+    }
 }

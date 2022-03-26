@@ -14,12 +14,13 @@ public class InvestmentStrategy {
         assets.stream()
                 .forEach(asset -> asset.setTimeSeriesBars(candleStickDownloader.downloadCandleSticks(asset.getTicker(), Interval.MONTHLY, 120)));
 
-        InvestmentParam investmentParam = InvestmentParam.builder().lengthofInvestment(60).capitalPerPeriod(500).build();
+        InvestmentParam investmentParam = InvestmentParam.builder().lengthofInvestment(120).capitalPerPeriod(500).build();
         CostAverageInvestment costAverageInvestment = CostAverageInvestment.builder().investmentParam(investmentParam).assets(assets).build();
         InvestmentReport investmentReport = costAverageInvestment.runInvestment();
 
 
         StringBuilder builder = new StringBuilder();
+        builder.append("Total Assets : ").append(investmentReport.portfolioDistribution()).append("\n");
         builder.append("Total Invested : ").append(investmentReport.totalAmountInvested()).append("\n");
         builder.append("Current Asset Value : ").append(investmentReport.totalCurrentValue()).append("\n");
         builder.append("Percentage G/L : ").append(investmentReport.percentReturns()).append("\n");
@@ -42,7 +43,7 @@ public class InvestmentStrategy {
         }*/
 
         //Top 10 Companies by Sector, Sales Growth/5yr > 25%[Finiz filter] and sorted by MCap
-        for (String ticker : Arrays.asList("NVDA","CRM","AMD","NOW","UBER","SQ","WDAY","PANW","ZS","NET", //TEchnology
+        for (String ticker : Arrays.asList("NVDA","CRM","AMD","NOW","UBER","SQ","WDAY","PANW","ZS","NET", //Technology
                                            "CI","REGN","VRTX","MRNA","CNC","DXCM","ALGN","VEEV","SGEN","ALNY", //Healthcare
                                             "MPLX","LNG","FANG","TPL","PDCE","MTDR","CHX","VNOM","CPE","KOS", //ENERGY
                                             "KKR","ARES","CG","SSB","VIRT","ORCC","KNSL","SI","PPBI","COOP" //Financial
@@ -64,13 +65,13 @@ public class InvestmentStrategy {
         List<Asset> otherAssets =
                 Arrays.asList(
                       Asset.builder().ticker("XLK").assetType(AssetType.ETF).build(), // Technology
- /*                         Asset.builder().ticker("XLV").assetType(AssetType.ETF).build(), // Healthcare
+                          Asset.builder().ticker("XLV").assetType(AssetType.ETF).build(), // Healthcare
                         Asset.builder().ticker("XLF").assetType(AssetType.ETF).build(), // Financial
                         Asset.builder().ticker("XLI").assetType(AssetType.ETF).build(), // Industrials
                         Asset.builder().ticker("VNQ").assetType(AssetType.ETF).build(), // Real Estate
                         Asset.builder().ticker("XLE").assetType(AssetType.ETF).build(), // Energy
                         Asset.builder().ticker("XLB").assetType(AssetType.ETF).build(), // Materials
-                        Asset.builder().ticker("GLD").assetType(AssetType.METAL).build(),*/
+                        Asset.builder().ticker("GLD").assetType(AssetType.METAL).build(),
                        Asset.builder().ticker("SPY").assetType(AssetType.ETF).build(),
                        // Asset.builder().ticker("VB").assetType(AssetType.ETF).build(), // Small Cap
                        // Asset.builder().ticker("VTV").assetType(AssetType.ETF).build() // Value Stocks
