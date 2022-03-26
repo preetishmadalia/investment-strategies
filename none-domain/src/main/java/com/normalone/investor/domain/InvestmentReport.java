@@ -3,9 +3,7 @@ package com.normalone.investor.domain;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -41,14 +39,34 @@ public class InvestmentReport {
     }
 
     public Set<String> worstAssetsByPercentageReturns() {
+
         return this.assets.stream()
                 .sorted(Comparator.comparing(asset -> asset.mathFunction(asset.getCurrentInvestmentValue(), asset.getTotalAmountInvested(), percentageReturnsFunc())))
                 .limit(2).map(asset -> asset.getTicker() + "["+ percentReturnsAsset(asset.getTicker()) + "]").collect(Collectors.toSet());
     }
 
     public Set<String> bestAssetsByPercentageReturns() {
+        if(assets.size() < 3) return new HashSet<>();
         return this.assets.stream()
                 .sorted(Comparator.comparing(asset -> asset.mathFunction(asset.getCurrentInvestmentValue(), asset.getTotalAmountInvested(), percentageReturnsFunc())))
                 .skip(this.assets.size() - 2).map(asset -> asset.getTicker() + "["+ percentReturnsAsset(asset.getTicker()) + "]").collect(Collectors.toSet());
+    }
+
+    public String portfolioDistribution() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Num. of assets : ").append(numOfAssets()).append(", ");
+        builder.append("Stocks : ").append(numOfAssets(AssetType.STOCK)).append(", ");
+        builder.append("ETF : ").append(numOfAssets(AssetType.ETF)).append(", ");
+        builder.append("Commodity : ").append(numOfAssets(AssetType.COMMODITY)).append(", ");
+        builder.append("Crypto : ").append(numOfAssets(AssetType.CRYPTO));
+        return builder.toString();
+    }
+
+    public long numOfAssets() {
+        return this.assets.size();
+    }
+
+    public long numOfAssets(AssetType type) {
+        return this.assets.stream().filter(asset -> asset.getAssetType().equals(type)).count();
     }
 }
