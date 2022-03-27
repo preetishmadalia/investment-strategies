@@ -14,7 +14,7 @@ public class InvestmentStrategy {
         assets.stream()
                 .forEach(asset -> asset.setTimeSeriesBars(candleStickDownloader.downloadCandleSticks(asset.getTicker(), Interval.MONTHLY, 120)));
 
-        InvestmentParam investmentParam = InvestmentParam.builder().lengthofInvestment(120).capitalPerPeriod(500).build();
+        InvestmentParam investmentParam = InvestmentParam.builder().lengthofInvestment(120).capitalPerPeriod(1100).build();
         CostAverageInvestment costAverageInvestment = CostAverageInvestment.builder().investmentParam(investmentParam).assets(assets).build();
         InvestmentReport investmentReport = costAverageInvestment.runInvestment();
 
