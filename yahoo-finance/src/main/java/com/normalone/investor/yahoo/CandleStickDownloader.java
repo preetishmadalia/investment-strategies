@@ -7,6 +7,8 @@ import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
 import yahoofinance.histquotes.HistoricalQuote;
 import yahoofinance.histquotes.Interval;
+import yahoofinance.histquotes2.QueryInterval;
+import yahoofinance.query2v8.HistQuotesQuery2V8Request;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -53,6 +55,21 @@ public class CandleStickDownloader {
         return downloadCandleSticks(ticker, interval, from, to);
     }
 
+    /**
+     * Yahoo QueryV8
+     * @param ticker
+     * @param interval
+     * @param length
+     * @return
+     */
+    public List<TimeSeriesBar> downloadCandleSticks(final String ticker, final QueryInterval interval, final int length) {
+        Calendar from = Calendar.getInstance();
+        from.add(getField(interval), - Math.max(0, length - 1));
+        Calendar to = Calendar.getInstance();
+
+        return downloadCandleSticks(ticker, interval, from, to);
+    }
+
     public List<TimeSeriesBar> downloadCandleSticks(final String ticker, final Interval interval, Calendar from, Calendar to) {
 
         try {
@@ -70,8 +87,31 @@ public class CandleStickDownloader {
         return Collections.emptyList();
     }
 
+    public List<TimeSeriesBar> downloadCandleSticks(final String ticker, final QueryInterval interval, Calendar from, Calendar to) {
+
+        try {
+            HistQuotesQuery2V8Request hist = new HistQuotesQuery2V8Request(ticker, from, to, interval);
+            List<HistoricalQuote> quotes = hist.getResult();
+            if(quotes != null && !quotes.isEmpty() )
+                return quotes
+                        .stream()
+                        .map(yahooCandleConversion()::apply)
+                        .filter(timeSeriesBar ->  filterCandle(timeSeriesBar))
+                        .collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.error("Error downloading ticker, {}", ticker);
+        }
+        return Collections.emptyList();
+    }
+
     public static int getField(Interval interval) {
         if(interval == Interval.MONTHLY) return Calendar.MONTH;
+        return Calendar.YEAR;
+    }
+
+    public static int getField(QueryInterval interval) {
+        if(interval == QueryInterval.MONTHLY) return Calendar.MONTH;
         return Calendar.YEAR;
     }
 }

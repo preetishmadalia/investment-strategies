@@ -3,6 +3,7 @@ package com.normalone.investor.strategy;
 import com.normalone.investor.domain.*;
 import com.normalone.investor.yahoo.CandleStickDownloader;
 import yahoofinance.histquotes.Interval;
+import yahoofinance.histquotes2.QueryInterval;
 
 import java.util.*;
 
@@ -12,7 +13,7 @@ public class InvestmentStrategy {
         CandleStickDownloader candleStickDownloader = CandleStickDownloader.builder().build();
         Collection<Asset> assets = assetsToTest();
         assets.stream()
-                .forEach(asset -> asset.setTimeSeriesBars(candleStickDownloader.downloadCandleSticks(asset.getTicker(), Interval.MONTHLY, 120)));
+                .forEach(asset -> asset.setTimeSeriesBars(candleStickDownloader.downloadCandleSticks(asset.getTicker(), QueryInterval.MONTHLY, 120)));
 
         InvestmentParam investmentParam = InvestmentParam.builder().lengthofInvestment(120).capitalPerPeriod(1100).build();
         CostAverageInvestment costAverageInvestment = CostAverageInvestment.builder().investmentParam(investmentParam).assets(assets).build();
